@@ -1,0 +1,38 @@
+{
+  "name": "dsh-plugin-dedupe",
+  "version": "0.1.0",
+  "description": "DSH 插件：防止重复安装插件。通过 preinstall 钩子在 pnpm install 前扫描并拦截重复插件。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./check": "./scripts/check-duplicates.mjs"
+  },
+  "files": [
+    "lib",
+    "scripts",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "check": "node scripts/check-duplicates.mjs"
+  },
+  "bin": {
+    "dsh-dedupe": "./scripts/check-duplicates.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  }
+}
