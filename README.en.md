@@ -12,9 +12,15 @@
 
 2. **preinstall hook**: Can be used as a `pnpm install` preinstall hook. If duplicates are found, it returns a non-zero exit code and **blocks the installation**.
 
-## Screenshot
+## Example output
 
-![dsh-plugin-dedupe demo](docs/screenshot.png)
+```text
+[dsh-plugin-dedupe] Scanning profile: C:\Users\31506\.dsh\profiles\web
+❌ Detected duplicate declaration: "dsh-agent-teams" has multiple sources in package.json:
+   github:NanmiCoder/dsh-agent-teams
+   file:E:/fake/dsh-agent-teams
+[dsh-plugin-dedupe] Detected 1 duplicate plugin error, installation blocked.
+```
 
 ## Installation
 
@@ -104,7 +110,7 @@ dsh-plugin-dedupe/
 │   └── check-duplicates.mjs  # Standalone check script / preinstall hook
 ├── cordis.patch.yml      # Cordis patch registration
 ├── docs/
-│   └── screenshot.png    # Demo screenshot
+│   └── screenshot.txt    # Demo output (text)
 ├── README.md             # Chinese docs
 ├── README.en.md          # English docs
 └── LICENSE
