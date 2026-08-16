@@ -1,0 +1,3 @@
+[dsh-plugin-dedupe] 扫描 profile: E:\deepseek\work\demo-profile
+❌ 检测到重复声明: "dsh-agent-teams" 在 package.json 中有多个来源: github:NanmiCoder/dsh-agent-teams, file:E:/fake/dsh-agent-teams
+[dsh-plugin-dedupe] 检测到 1 个重复插件错误，已阻断安装。
