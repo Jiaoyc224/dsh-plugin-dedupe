@@ -1,0 +1,8 @@
+# dsh-plugin-dedupe: 插件去重守护
+# 通过 Cordis patch 注册，在 DSH 启动时扫描并警告/阻断重复插件
+# 同时提供 preinstall 钩子脚本，可在 profile package.json 中引用
+
+- insert:
+  - id: dsh-plugin-dedupe
+    name: "Plugin Dedupe Guard"
+    apply: ./lib/index.js
