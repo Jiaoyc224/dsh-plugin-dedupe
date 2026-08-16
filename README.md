@@ -1,6 +1,18 @@
 # dsh-plugin-dedupe
 
+[English](README.en.md) · 简体中文
+
 **DSH 插件去重守护** — 防止在 DSH profile 中重复安装同一插件。
+
+## 运行效果
+
+```text
+[dsh-plugin-dedupe] 扫描 profile: C:\Users\31506\.dsh\profiles\web
+❌ 检测到重复声明: "dsh-agent-teams" 在 package.json 中有多个来源:
+   github:NanmiCoder/dsh-agent-teams
+   file:E:/fake/dsh-agent-teams
+[dsh-plugin-dedupe] 检测到 1 个重复插件错误，已阻断安装。
+```
 
 ## 功能
 
@@ -99,9 +111,18 @@ dsh-plugin-dedupe/
 ├── scripts/
 │   └── check-duplicates.mjs  # 独立检查脚本，可作 preinstall
 ├── cordis.patch.yml      # Cordis patch 注册插件
-├── README.md
+├── docs/
+│   └── screenshot.txt    # 运行效果文本截图
+├── examples/
+│   └── README.md         # 详细示例配置
+├── README.md             # 中文文档
+├── README.en.md          # 英文文档
 └── LICENSE
 ```
+
+## 详细示例
+
+更多完整示例请查看 [examples/README.md](examples/README.md)。
 
 ## 原理
 
