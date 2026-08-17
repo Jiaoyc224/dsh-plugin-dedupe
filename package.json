@@ -13,6 +13,9 @@
     "scripts",
     "cordis.patch.yml",
     "README.md",
+    "README.en.md",
+    "docs",
+    "examples",
     "LICENSE"
   ],
   "license": "MIT",
