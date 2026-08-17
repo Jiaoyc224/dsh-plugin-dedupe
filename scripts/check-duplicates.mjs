@@ -55,7 +55,22 @@ function scanNodeModules(profileRoot) {
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       if (entry.name.startsWith('.') || entry.name === '.pnpm') continue;
-      // 兼容 scoped 包（@scope/name 会作为目录名出现，这里简化只统计顶层目录）
+      // scoped 包：node_modules/@scope/name/package.json
+      if (entry.name.startsWith('@')) {
+        const scopeDir = join(nmDir, entry.name);
+        const scopedEntries = readdirSync(scopeDir, { withFileTypes: true });
+        for (const sub of scopedEntries) {
+          if (!sub.isDirectory()) continue;
+          const pkgPath = join(scopeDir, sub.name, 'package.json');
+          if (existsSync(pkgPath)) {
+            try {
+              const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+              if (pkg.name) result[pkg.name] = (result[pkg.name] || 0) + 1;
+            } catch { }
+          }
+        }
+        continue;
+      }
       const pkgPath = join(nmDir, entry.name, 'package.json');
       if (existsSync(pkgPath)) {
         try {
@@ -126,7 +141,7 @@ function checkDuplicates(profileRoot) {
 }
 
 function main() {
-  const { values: { profile: profileArg } } = parseArgs({
+  const { values } = parseArgs({
     args: process.argv.slice(2),
     options: {
       profile: { type: 'string', short: 'p', description: 'Profile directory path' },
@@ -135,8 +150,9 @@ function main() {
     strict: true,
     allowPositionals: true
   });
+  const profileArg = values.profile;
 
-  if (profileArg === '--help' || profileArg === '-h') {
+  if (values.help) {
     console.log(`
 用法: node check-duplicates.mjs [--profile <path>]
 
