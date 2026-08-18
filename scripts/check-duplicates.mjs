@@ -25,7 +25,8 @@ function findProfileRoot(startDir) {
     try {
       if (existsSync(pkgPath)) {
         const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
-        if (pkg.dsh?.profile || pkg.name?.startsWith('dsh-profile')) {
+        // 修复：完整匹配条件
+        if (pkg.dsh?.profile || pkg.name === 'dsh-profile-web' || pkg.name?.startsWith('dsh-profile-')) {
           return dir;
         }
       }
@@ -55,7 +56,22 @@ function scanNodeModules(profileRoot) {
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       if (entry.name.startsWith('.') || entry.name === '.pnpm') continue;
-      // 兼容 scoped 包（@scope/name 会作为目录名出现，这里简化只统计顶层目录）
+      // scoped 包：node_modules/@scope/name/package.json
+      if (entry.name.startsWith('@')) {
+        const scopeDir = join(nmDir, entry.name);
+        const scopedEntries = readdirSync(scopeDir, { withFileTypes: true });
+        for (const sub of scopedEntries) {
+          if (!sub.isDirectory()) continue;
+          const pkgPath = join(scopeDir, sub.name, 'package.json');
+          if (existsSync(pkgPath)) {
+            try {
+              const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+              if (pkg.name) result[pkg.name] = (result[pkg.name] || 0) + 1;
+            } catch { }
+          }
+        }
+        continue;
+      }
       const pkgPath = join(nmDir, entry.name, 'package.json');
       if (existsSync(pkgPath)) {
         try {
@@ -84,6 +100,8 @@ function checkDuplicates(profileRoot) {
   addDeclared(pkg.dependencies);
   addDeclared(pkg.devDependencies);
   addDeclared(pkg.optionalDependencies);
+  // 新增：扫描 peerDependencies
+  addDeclared(pkg.peerDependencies);
 
   const installed = scanNodeModules(profileRoot);
 
@@ -94,7 +112,14 @@ function checkDuplicates(profileRoot) {
   for (const [name, specs] of Object.entries(declared)) {
     const uniqueSpecs = [...new Set(specs)];
     if (uniqueSpecs.length > 1) {
-      errors.push(`检测到重复声明: "${name}" 在 package.json 中有多个来源: ${uniqueSpecs.join(', ')}`);
+      // 简单启发式：若所有 spec 协议相同，视为同一来源不同字段，降级为警告
+      const protocols = uniqueSpecs.map(s => s.split(':')[0]);
+      const allSameProtocol = protocols.every(p => p === protocols[0]);
+      if (allSameProtocol) {
+        warnings.push(`同一包 "${name}" 在多字段声明且来源协议相同: ${uniqueSpecs.join(', ')}（可能是有意的 dev/prod 区分）`);
+      } else {
+        errors.push(`检测到重复声明: "${name}" 在 package.json 中有多个不同来源: ${uniqueSpecs.join(', ')}`);
+      }
     }
   }
 
@@ -126,7 +151,7 @@ function checkDuplicates(profileRoot) {
 }
 
 function main() {
-  const { values: { profile: profileArg } } = parseArgs({
+  const { values } = parseArgs({
     args: process.argv.slice(2),
     options: {
       profile: { type: 'string', short: 'p', description: 'Profile directory path' },
@@ -135,8 +160,9 @@ function main() {
     strict: true,
     allowPositionals: true
   });
+  const profileArg = values.profile;
 
-  if (profileArg === '--help' || profileArg === '-h') {
+  if (values.help) {
     console.log(`
 用法: node check-duplicates.mjs [--profile <path>]
 
@@ -177,8 +203,10 @@ function main() {
 // 导出供测试/其他模块使用
 export { findProfileRoot, checkDuplicates, scanNodeModules };
 
-// 直接运行时执行 main
-const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+// 直接运行时执行 main - 修复跨平台路径比较
+const scriptPath = resolve(fileURLToPath(import.meta.url));
+const argv1 = process.argv[1] ? resolve(process.argv[1]) : '';
+const isMain = argv1 === scriptPath;
 if (isMain) {
   process.exit(main());
 }

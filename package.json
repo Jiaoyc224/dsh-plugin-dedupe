@@ -13,16 +13,38 @@
     "scripts",
     "cordis.patch.yml",
     "README.md",
+    "README.en.md",
+    "docs",
+    "examples",
     "LICENSE"
   ],
   "license": "MIT",
+  "keywords": [
+    "dsh",
+    "deepseek",
+    "cordis",
+    "plugin",
+    "deduplicate",
+    "duplicate",
+    "guard",
+    "preinstall"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jiaoyc224/dsh-plugin-dedupe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jiaoyc224/dsh-plugin-dedupe/issues"
+  },
+  "homepage": "https://github.com/Jiaoyc224/dsh-plugin-dedupe#readme",
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
     }
   },
   "scripts": {
-    "check": "node scripts/check-duplicates.mjs"
+    "check": "node scripts/check-duplicates.mjs",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "bin": {
     "dsh-dedupe": "./scripts/check-duplicates.mjs"

@@ -3,6 +3,7 @@
 # 同时提供 preinstall 钩子脚本，可在 profile package.json 中引用
 
 - insert:
-  - id: dsh-plugin-dedupe
-    name: "Plugin Dedupe Guard"
-    apply: ./lib/index.js
+    - id: dsh-plugin-dedupe
+      name: "Plugin Dedupe Guard"
+      plugin: true
+      entry: "lib/index.js"

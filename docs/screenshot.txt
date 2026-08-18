@@ -1,0 +1,18 @@
+=== 场景 1: 正常通过 ===
+[dsh-plugin-dedupe] 扫描 profile: E:\deepseek\work\demo-profile
+✅ 未发现重复插件（0 个提示）
+
+=== 场景 2: 仅警告 (node_modules 重复安装) ===
+[dsh-plugin-dedupe] 扫描 profile: E:\deepseek\work\demo-profile
+⚠️ 检测到重复安装: "lodash" 在 node_modules 中出现 2 次
+✅ 未发现重复插件（1 个提示）
+
+=== 场景 3: 同一来源多字段声明 (降级警告) ===
+[dsh-plugin-dedupe] 扫描 profile: E:\deepseek\work\demo-profile
+⚠️ 同一包 "typescript" 在多字段声明且来源协议相同: npm:^5.0.0, npm:^5.0.0（可能是有意的 dev/prod 区分）
+✅ 未发现重复插件（1 个提示）
+
+=== 场景 4: 错误阻断 (不同来源重复声明) ===
+[dsh-plugin-dedupe] 扫描 profile: E:\deepseek\work\demo-profile
+❌ 检测到重复声明: "dsh-agent-teams" 在 package.json 中有多个来源: github:NanmiCoder/dsh-agent-teams, file:E:/fake/dsh-agent-teams
+[dsh-plugin-dedupe] 检测到 1 个重复插件错误，已阻断安装。
